@@ -27,6 +27,8 @@ import (
 	// Uncomment the following line to load the gcp plugin (only required to authenticate against GKE clusters).
 	// _ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 
+	clientset "demo-k8s-controller/pkg/client/clientset/versioned"
+	informers "demo-k8s-controller/pkg/client/informers/externalversions"
 	"demo-k8s-controller/pkg/signals"
 )
 
@@ -50,18 +52,25 @@ func main() {
 	if err != nil {
 		klog.Fatalf("Error building kubernetes clientset: %s", err.Error())
 	}
-	klog.Info("kubeClient ready")
+
+	exampleClient, err := clientset.NewForConfig(cfg)
+	if err != nil {
+		klog.Fatalf("Error building example clientset: %s", err.Error())
+	}
 
 	kubeInformerFactory := kubeinformers.NewSharedInformerFactory(kubeClient, time.Second*30)
+	exampleInformerFactory := informers.NewSharedInformerFactory(exampleClient, time.Second*30)
 
-	controller := NewController(kubeClient, kubeInformerFactory.Apps().V1().Deployments())
+	controller := NewController(kubeClient, exampleClient,
+		kubeInformerFactory.Apps().V1().Deployments(),
+		exampleInformerFactory.Samplecontroller().V1alpha1().Foos())
 
 	// notice that there is no need to run Start methods in a separate goroutine. (i.e. go kubeInformerFactory.Start(stopCh)
 	// Start method is non-blocking and runs all registered informers in a dedicated goroutine.
 	kubeInformerFactory.Start(stopCh)
-	klog.Info("kubeInformerFactory start")
+	exampleInformerFactory.Start(stopCh)
 
-	if err = controller.Run(1, stopCh); err != nil {
+	if err = controller.Run(2, stopCh); err != nil {
 		klog.Fatalf("Error running controller: %s", err.Error())
 	}
 }
