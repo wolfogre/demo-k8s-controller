@@ -3,7 +3,7 @@
 This repository implements a simple controller for watching Foo resources as
 defined with a CustomResourceDefinition (CRD).
 
-**Note:** go-get or vendor this package as `demo-k8s-controller`.
+**Note:** go-get or vendor this package as `k8s.io/sample-controller`.
 
 This particular example demonstrates how to perform basic operations such as:
 
@@ -141,6 +141,6 @@ k8s.io/client-go.
 ## Where does it come from?
 
 `sample-controller` is synced from
-https://github.com/kubernetes/kubernetes/blob/master/staging/src/demo-k8s-controller.
+https://github.com/kubernetes/kubernetes/blob/master/staging/src/k8s.io/sample-controller.
 Code changes are made in that location, merged into k8s.io/kubernetes and
 later synced here.
